@@ -1,0 +1,15 @@
+{
+  "name": "alexa_mongodb_api",
+  "version": "1.0.0",
+  "description": "A Node.js API for connecting MongoDB to the Family Reminders Alexa Skill",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Diptark Bose",
+  "license": "MIT",
+  "dependencies": {
+    "ask-sdk": "^2.12.1",
+    "mongodb": "^5.1.0"
+  }
+}
