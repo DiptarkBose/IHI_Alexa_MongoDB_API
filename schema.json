@@ -1,0 +1,65 @@
+/*
+// Patient
+{
+	"id": 1,
+	"firstName": "John",
+	"lastName": "Doe",
+	"dob": "05/10/1960",
+	"gender": "Male",
+	"family": {"Daughter": [101], "Grandson": [102], "Wife": [104]},
+	"anecdotes": {101: [1, 2]},
+	"lastKnownLatitude": "NaN",
+	"lastKnownLongitude": "NaN",
+}
+
+// Person 101
+{
+	"id": 101,
+	"firstName": "Jane",
+	"lastName": "Doe",
+	"dob": "05/01/1996",
+	"gender": "Female",
+	"relatedTo": {1: "Daughter"},
+	"eventsCreated": {},
+	"photoURL": "",
+}
+
+// Person 102
+{
+	"id": 102,
+	"firstName": "Jack",
+	"lastName": "Doe",
+	"dob": "05/17/2015",
+	"gender": "Male",
+	"relatedTo": {1: "Grandson"},
+	"eventsCreated": {},
+	"photoURL": "",
+}
+
+// Person 104
+{
+	"id": 104,
+	"firstName": "Emily",
+	"lastName": "Doe",
+	"dob": "05/25/1965",
+	"gender": "Female",
+	"relatedTo": {1: "Wife"},
+	"eventsCreated": {},
+	"photoURL": "",
+}
+
+
+// Anecdote 1
+{
+	"id": 1,
+	"title": "Discussion about Jack's birthday gift.",
+	"description": "We discussed what to buy for Jack for his birthday. Mom suggested a sweater, whereas you wanted to buy him a toy."
+}
+
+// Anecdote 2
+{
+	"id": 2,
+	"title": "Vacation Plans",
+	"description": "You wanted to go for a vacation somewhere, and told me to check back with you regarding that."
+}
+*/

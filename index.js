@@ -1,30 +1,38 @@
-/* *
- * This sample demonstrates handling intents from an Alexa skill using the Alexa Skills Kit SDK (v2).
- * Please visit https://alexa.design/cookbook for additional examples on implementing slots, dialog management,
- * session persistence, api calls, and more.
- * */
 const Alexa = require('ask-sdk-core');
 const { MongoClient, ServerApiVersion } = require('mongodb');
 
 const uri = "mongodb+srv://teamDPI:teamDPI@familyremindersdb.nnuiz8t.mongodb.net/?retryWrites=true&w=majority";
 const client = new MongoClient(uri);
 
-async function findPatientInfo(fName, lName) {
-  const result = await client.db("FamilyRemindersAppDB").collection("Patient").findOne({ firstName: fName });
-
-  if(result) {
-    return result;
-  }
-}
-
 const PersonSearchHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'PersonSearch';
     },
-    handle(handlerInput) {
-        const speakOutput = 'This is the person search functionality.';
-
+    async handle(handlerInput) {
+        const myDetails = await client.db("FamilyRemindersAppDB").collection("Patient").findOne({ firstName: "John" });
+        const family = myDetails["family"];
+        var recognized = false;
+        var relationship = "";
+        const personName = handlerInput.requestEnvelope.request.intent.slots.HumanName.value;
+        for (const relation in family) {
+          const personList = family[relation];
+          for (let i=0; i<personList.length; i++) {
+            personID = personList[i];
+            const personDetails = await client.db("FamilyRemindersAppDB").collection("Person").findOne({ id: personID });
+            if(personDetails.firstName == personName) {
+              recognized = true;
+              relationship = relation.toLowerCase();
+              break;
+            }
+          }
+        }
+        var speakOutput = "";
+        if(recognized) {
+          speakOutput = personName + " is your " + relationship + ". If you want to know more about interactions with them, you can ask me to tell you some anecdotes with " + personName + ".";
+        } else {
+          speakOutput = "I don't think you know anyone by the name " + personName + ".";
+        }
         return handlerInput.responseBuilder
             .speak(speakOutput)
             .reprompt(speakOutput)
@@ -38,8 +46,8 @@ const SelfSearchHandler = {
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'SelfSearch';
     },
     async handle(handlerInput) {
-        const result = await client.db("FamilyRemindersAppDB").collection("Patient").findOne({ firstName: "John" });
-        const speakOutput = "Your name is "+result.firstName+". Your date of birth is "+ result.dob;
+        const my_details = await client.db("FamilyRemindersAppDB").collection("Patient").findOne({ firstName: "John" });
+        const speakOutput = "Your name is "+my_details.firstName+". You were born on "+ my_details.dob + ".";
         return handlerInput.responseBuilder
             .speak(speakOutput)
             .reprompt(speakOutput)
@@ -52,7 +60,7 @@ const LaunchRequestHandler = {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'LaunchRequest';
     },
     handle(handlerInput) {
-        const speakOutput = 'Welcome, you can say Hello or Help. Which would you like to try?';
+        const speakOutput = "Hi! I am Alzheimers Buddy, an Alexa skill that helps you stay in touch with all family and friends! What can I help you with?";
 
         return handlerInput.responseBuilder
             .speak(speakOutput)
