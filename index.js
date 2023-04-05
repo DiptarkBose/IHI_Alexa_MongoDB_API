@@ -46,8 +46,42 @@ const SelfSearchHandler = {
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'SelfSearch';
     },
     async handle(handlerInput) {
-        const my_details = await client.db("FamilyRemindersAppDB").collection("Patient").findOne({ firstName: "John" });
-        const speakOutput = "Your name is "+my_details.firstName+". You were born on "+ my_details.dob + ".";
+        const myDetails = await client.db("FamilyRemindersAppDB").collection("Patient").findOne({ firstName: "John" });
+        const speakOutput = "Your name is "+myDetails.firstName+". You were born on "+ myDetails.dob + ".";
+        return handlerInput.responseBuilder
+            .speak(speakOutput)
+            .reprompt(speakOutput)
+            .getResponse();
+    }
+};
+
+const RelationSearchHandler = {
+    canHandle(handlerInput) {
+        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'RelationSearch';
+    },
+    async handle(handlerInput) {
+        const myDetails = await client.db("FamilyRemindersAppDB").collection("Patient").findOne({ firstName: "John" });
+        const family = myDetails.family;
+        var relation = handlerInput.requestEnvelope.request.intent.slots.Relationship.value;
+        relation = relation.charAt(0).toUpperCase() + relation.slice(1);
+        var speakOutput = "";
+        
+        if(family[relation] != null) {
+          speakOutput += "Yes, you have " + family[relation].length + ". Their names are ";
+          const personList = family[relation];
+          for (let i=0; i<personList.length; i++) {
+            personID = personList[i];
+            const personDetails = await client.db("FamilyRemindersAppDB").collection("Person").findOne({ id: personID });
+            if(i != 0) {
+              speakOutput += ", ";
+            }
+            speakOutput += personDetails.firstName;
+          }
+          speakOutput += ".";
+        } else {
+          speakOutput += "Nope, you don't have any " + relation + "s.";
+        }
         return handlerInput.responseBuilder
             .speak(speakOutput)
             .reprompt(speakOutput)
@@ -177,6 +211,7 @@ exports.handler = Alexa.SkillBuilders.custom()
     .addRequestHandlers(
         PersonSearchHandler,
         SelfSearchHandler,
+        RelationSearchHandler,
         LaunchRequestHandler,
         HelloWorldIntentHandler,
         HelpIntentHandler,
