@@ -55,6 +55,35 @@ const SelfSearchHandler = {
     }
 };
 
+const AnecdoteSearchHandler = {
+    canHandle(handlerInput) {
+        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AnecdoteSearch';
+    },
+    async handle(handlerInput) {
+        const personName = handlerInput.requestEnvelope.request.intent.slots.HumanName.value;
+        const personDetails = await client.db("FamilyRemindersAppDB").collection("Person").findOne({ firstName: personName });
+        const myDetails = await client.db("FamilyRemindersAppDB").collection("Patient").findOne({ firstName: "John" });
+        const anecdotes = myDetails.anecdotes;
+        var speakOutput = "";
+        if(myDetails.anecdotes[personDetails.id] != null) {
+          const anecdoteIDList = anecdotes[personDetails.id];
+          speakOutput = "Here are some interactions you've had with "+personName+": \n";
+          for(let i=0; i<anecdoteIDList.length; i++) {
+            const anecdoteID = anecdoteIDList[i];
+            const anecdote = await client.db("FamilyRemindersAppDB").collection("Anecdote").findOne({ id: anecdoteID });
+            speakOutput += anecdote.title + ": " + anecdote.description + ".\n";
+          }
+        } else {
+            speakOutput += "I'm sorry, but I don't have any records of your interactions with " + personName +".";
+        }
+        return handlerInput.responseBuilder
+            .speak(speakOutput)
+            .reprompt(speakOutput)
+            .getResponse();
+    }
+};
+
 const RelationSearchHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
@@ -66,7 +95,7 @@ const RelationSearchHandler = {
         var relation = handlerInput.requestEnvelope.request.intent.slots.Relationship.value;
         relation = relation.charAt(0).toUpperCase() + relation.slice(1);
         var speakOutput = "";
-        
+
         if(family[relation] != null) {
           speakOutput += "Yes, you have " + family[relation].length + ". Their names are ";
           const personList = family[relation];
@@ -212,6 +241,7 @@ exports.handler = Alexa.SkillBuilders.custom()
         PersonSearchHandler,
         SelfSearchHandler,
         RelationSearchHandler,
+        AnecdoteSearchHandler,
         LaunchRequestHandler,
         HelloWorldIntentHandler,
         HelpIntentHandler,
