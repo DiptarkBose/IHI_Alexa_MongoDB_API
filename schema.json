@@ -8,6 +8,7 @@
 	"gender": "Male",
 	"family": {"Daughter": [101], "Grandson": [102], "Wife": [104]},
 	"anecdotes": {101: [1, 2]},
+	"events": [1],
 	"lastKnownLatitude": "NaN",
 	"lastKnownLongitude": "NaN",
 }
@@ -61,5 +62,15 @@
 	"id": 2,
 	"title": "Vacation Plans",
 	"description": "You wanted to go for a vacation somewhere, and told me to check back with you regarding that."
+}
+
+// Event 1
+{
+	"id": 1,
+	"title": "Jack's Birthday",
+	"description": "A family get-together has been organized for Jack's birthday. Make sure that you attend!",
+	"startDate": "May 22, 2023",
+	"startTime": "18:00",
+	"photoURL": "",
 }
 */

@@ -55,6 +55,32 @@ const SelfSearchHandler = {
     }
 };
 
+const EventNotificationHandler = {
+    canHandle(handlerInput) {
+        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'EventNotification';
+    },
+    async handle(handlerInput) {
+        const myDetails = await client.db("FamilyRemindersAppDB").collection("Patient").findOne({ firstName: "John" });
+        const events = myDetails.events;
+        var speakOutput = "";
+        if(events.length > 0) {
+          speakOutput += "Here are some upcoming events that you should be aware of: \n";
+          for(let i=0; i<events.length; i++) {
+            const eventID = events[i];
+            const eventDetails = await client.db("FamilyRemindersAppDB").collection("Event").findOne({ id: eventID });
+            speakOutput += eventDetails.title + " on " + eventDetails.startDate + ", at " + eventDetails.startTime + ": " + eventDetails.description + "\n";
+          }
+        } else {
+          speakOutput = "You don't seem to have any upcoming events."
+        }
+        return handlerInput.responseBuilder
+            .speak(speakOutput)
+            .reprompt(speakOutput)
+            .getResponse();
+    }
+};
+
 const AnecdoteSearchHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
@@ -75,7 +101,7 @@ const AnecdoteSearchHandler = {
             speakOutput += anecdote.title + ": " + anecdote.description + ".\n";
           }
         } else {
-            speakOutput += "I'm sorry, but I don't have any records of your interactions with " + personName +".";
+            speakOutput += "I'm sorry, but I don't have any records of any interactions with " + personName +".";
         }
         return handlerInput.responseBuilder
             .speak(speakOutput)
@@ -242,6 +268,7 @@ exports.handler = Alexa.SkillBuilders.custom()
         SelfSearchHandler,
         RelationSearchHandler,
         AnecdoteSearchHandler,
+        EventNotificationHandler,
         LaunchRequestHandler,
         HelloWorldIntentHandler,
         HelpIntentHandler,
