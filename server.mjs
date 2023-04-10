@@ -1,6 +1,16 @@
-const Alexa = require('ask-sdk-core');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+// Imports
+import express from 'express';
+import morgan from 'morgan';
+import { ExpressAdapter } from 'ask-sdk-express-adapter';
+import Alexa from 'ask-sdk-core';
+import { MongoClient, ServerApiVersion } from 'mongodb';
 
+// Server Configs
+const app = express();
+app.use(morgan("dev"));
+const PORT = process.env.PORT || 3000;
+
+// DB configs
 const uri = "mongodb+srv://teamDPI:teamDPI@familyremindersdb.nnuiz8t.mongodb.net/?retryWrites=true&w=majority";
 const client = new MongoClient(uri);
 
@@ -149,6 +159,7 @@ const LaunchRequestHandler = {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'LaunchRequest';
     },
     handle(handlerInput) {
+        console.log("YO");
         const speakOutput = "Hi! I am Alzheimers Buddy, an Alexa skill that helps you stay in touch with all family and friends! What can I help you with?";
 
         return handlerInput.responseBuilder
@@ -257,12 +268,13 @@ const ErrorHandler = {
     }
 };
 
+// https://circle-bot.herokuapp.com/
 /**
  * This handler acts as the entry point for your skill, routing all request and response
  * payloads to the handlers above. Make sure any new handlers or interceptors you've
  * defined are included below. The order matters - they're processed top to bottom
  * */
-exports.handler = Alexa.SkillBuilders.custom()
+const skillBuilder = Alexa.SkillBuilders.custom()
     .addRequestHandlers(
         PersonSearchHandler,
         SelfSearchHandler,
@@ -274,7 +286,17 @@ exports.handler = Alexa.SkillBuilders.custom()
         HelpIntentHandler,
         CancelAndStopIntentHandler,
         FallbackIntentHandler,
-        SessionEndedRequestHandler)
+        SessionEndedRequestHandler
+      )
     .addErrorHandlers(
-        ErrorHandler)
-    .lambda();
+        ErrorHandler
+      )
+
+const skill = skillBuilder.create();
+const adapter = new ExpressAdapter(skill, false, false);
+
+app.post('api/v1/circle-bot-webhook', adapter.getRequestHandlers());
+app.use(express.json());
+app.listen(PORT, () => {
+  console.log("Welcome to Circle Bot's Webhook!");
+})
