@@ -7,13 +7,13 @@ import { MongoClient, ServerApiVersion } from 'mongodb';
 
 // Server Configs
 const app = express();
-app.use(morgan("dev"));
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 
 // DB configs
 const uri = "mongodb+srv://teamDPI:teamDPI@familyremindersdb.nnuiz8t.mongodb.net/?retryWrites=true&w=majority";
 const client = new MongoClient(uri);
 
+// Intent Handlers
 const PersonSearchHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
