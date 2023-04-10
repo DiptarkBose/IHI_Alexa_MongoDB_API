@@ -295,7 +295,7 @@ const skillBuilder = Alexa.SkillBuilders.custom()
 const skill = skillBuilder.create();
 const adapter = new ExpressAdapter(skill, false, false);
 
-app.post('api/v1/circle-bot-webhook', adapter.getRequestHandlers());
+app.post('api/v1/circle-bot-webhook/', adapter.getRequestHandlers());
 app.use(express.json());
 app.listen(PORT, () => {
   console.log("Welcome to Circle Bot's Webhook!");
