@@ -40,6 +40,42 @@ const PersonSearchHandler = {
     }
 };
 
+const BirthdayQueryHandler = {
+    canHandle(handlerInput) {
+        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'BirthdayQuery';
+    },
+    async handle(handlerInput) {
+        const myDetails = await client.db("FamilyRemindersAppDB").collection("Patient").findOne({ firstName: "John" });
+        const family = myDetails["family"];
+        var recognized = false;
+        var birthday = "";
+        const personName = handlerInput.requestEnvelope.request.intent.slots.HumanName.value;
+        for (const relation in family) {
+          const personList = family[relation];
+          for (let i=0; i<personList.length; i++) {
+            personID = personList[i];
+            const personDetails = await client.db("FamilyRemindersAppDB").collection("Person").findOne({ id: personID });
+            if(personDetails.firstName == personName) {
+              recognized = true;
+              birthday = personDetails.dob;
+              break;
+            }
+          }
+        }
+        var speakOutput = "";
+        if(recognized) {
+          speakOutput = personName + " was born on " + birthday + ".";
+        } else {
+          speakOutput = "I can't find " + personName + "'s birthday.";
+        }
+        return handlerInput.responseBuilder
+            .speak(speakOutput)
+            .reprompt(speakOutput)
+            .getResponse();
+    }
+};
+
 const SelfSearchHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
@@ -158,7 +194,6 @@ const LaunchRequestHandler = {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'LaunchRequest';
     },
     handle(handlerInput) {
-        console.log("YO");
         const speakOutput = "Hi! I am Circle Bot, an Alexa skill that helps you stay in touch with all family and friends! What can I help you with?";
 
         return handlerInput.responseBuilder
@@ -267,6 +302,7 @@ exports.handler = Alexa.SkillBuilders.custom()
         RelationSearchHandler,
         AnecdoteSearchHandler,
         EventNotificationHandler,
+        BirthdayQueryHandler,
         LaunchRequestHandler,
         HelpIntentHandler,
         CancelAndStopIntentHandler,
