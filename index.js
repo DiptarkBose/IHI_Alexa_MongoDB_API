@@ -69,7 +69,10 @@ const EventNotificationHandler = {
           for(let i=0; i<events.length; i++) {
             const eventID = events[i];
             const eventDetails = await client.db("FamilyRemindersAppDB").collection("Event").findOne({ id: eventID });
-            speakOutput += eventDetails.title + " on " + eventDetails.startDate + ", at " + eventDetails.startTime + ": " + eventDetails.description + "\n";
+            if(i != 0) {
+              speakOutput += "Also, ";
+            }
+            speakOutput += eventDetails.title + " on " + eventDetails.startDate + ", at " + eventDetails.startTime + ": " + eventDetails.description + "\n\n";
           }
         } else {
           speakOutput = "You don't seem to have any upcoming events."
@@ -98,7 +101,10 @@ const AnecdoteSearchHandler = {
           for(let i=0; i<anecdoteIDList.length; i++) {
             const anecdoteID = anecdoteIDList[i];
             const anecdote = await client.db("FamilyRemindersAppDB").collection("Anecdote").findOne({ id: anecdoteID });
-            speakOutput += anecdote.title + ": " + anecdote.description + ".\n";
+            if(i != 0) {
+              speakOutput += "Also, ";
+            }
+            speakOutput += anecdote.title + ": " + anecdote.description + "\n\n";
           }
         } else {
             speakOutput += "I'm sorry, but I don't have any records of any interactions with " + personName +".";
@@ -128,7 +134,10 @@ const RelationSearchHandler = {
           for (let i=0; i<personList.length; i++) {
             personID = personList[i];
             const personDetails = await client.db("FamilyRemindersAppDB").collection("Person").findOne({ id: personID });
-            if(i != 0) {
+            if(personList.length!= 1 && i == personList.length-1) {
+              speakOutput += " and ";
+            }
+            else if(i != 0) {
               speakOutput += ", ";
             }
             speakOutput += personDetails.firstName;
@@ -149,6 +158,7 @@ const LaunchRequestHandler = {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'LaunchRequest';
     },
     handle(handlerInput) {
+        console.log("YO");
         const speakOutput = "Hi! I am Circle Bot, an Alexa skill that helps you stay in touch with all family and friends! What can I help you with?";
 
         return handlerInput.responseBuilder
