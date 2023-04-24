@@ -108,7 +108,7 @@ const EventNotificationHandler = {
             if(i != 0) {
               speakOutput += "Also, ";
             }
-            speakOutput += eventDetails.title + " on " + eventDetails.startDate + ", at " + eventDetails.startTime + ": " + eventDetails.description + "\n\n";
+            speakOutput += eventDetails.title + " on " + eventDetails.startDate +  ": " + eventDetails.description + "\n\n";
           }
         } else {
           speakOutput = "You don't seem to have any upcoming events."
